@@ -7,10 +7,31 @@
 class MyScene extends THREE.Scene {
   constructor (unRenderer) {
     super();
-    var texture = new THREE.TextureLoader().load( '../imgs/fondo_espacial.jpg' );
-    var fondo = new THREE.MeshPhongMaterial();
-    fondo.map = texture;
-    this.background = texture;
+	
+    var path = "../Practica_2/imgs/";
+	var format = '.jpg';
+	var urls = [
+		path + 'px' + format, path + 'nx' + format,
+		path + 'py' + format, path + 'ny' + format,
+		path + 'pz' + format, path + 'nz' + format
+	];
+	
+	var textureCube = new THREE.CubeTextureLoader().load(urls);
+	
+	var shader = THREE.ShaderLib[ "cube" ];
+	shader.uniforms[ "tCube" ].value = textureCube;
+	
+	var material = new THREE.ShaderMaterial ( {
+		fragmentShader: shader.fragmentShader,
+		vertexShader: shader.vertexShader,
+		uniforms: shader.uniforms,
+		depthWrite: false,
+		side: THREE.BackSide
+	});
+	
+	this.environmentMesh = new THREE.Mesh (new THREE.BoxGeometry( 10000, 10000, 10000), material );
+	
+	this.add(this.environmentMesh);
     // Se añade a la gui los controles para manipular los elementos de esta clase
     this.createGUI ();
     
@@ -37,9 +58,9 @@ class MyScene extends THREE.Scene {
     this.add(this.model);
     this.createCamera (unRenderer);
 
-    while(!fin_partida){
+    /*while(!fin_partida){
         
-    }
+    }*/
 
     
     // Por último creamos la caja del ejemplo, como una instancia de una clase propia, que gestionará su creación y la interacción con la misma
@@ -50,13 +71,12 @@ class MyScene extends THREE.Scene {
     //   El ángulo del campo de visión en grados sexagesimales
     //   La razón de aspecto ancho/alto
     //   Los planos de recorte cercano y lejano
-    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    this.nave.add(this.camera);
+    this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
     // También se indica dónde se coloca
-    this.camera.position.set (this.nave.position.x,this.nave.position.y+300,this.nave.position.z-300);
+    this.camera.position.set (this.nave.position.x,this.nave.position.y,-(window.innerWidth/2)/Math.tan(22.5 * Math.PI/180));
     // Y hacia dónde mira
     var look = new THREE.Vector3 (this.nave.position.x,this.nave.position.y,this.nave.position.z);
-    this.camera.getWorldPosition(look);
+//    this.camera.getWorldPosition(look);
     this.camera.lookAt(look);
     
     /*this.camera.position.set (this.nave.position.x+750, this.nave.position.y+750, this.nave.position.z);
@@ -75,21 +95,6 @@ class MyScene extends THREE.Scene {
     this.cameraControl.panSpeed = 0.5;
     // Debe orbitar con respecto al punto de mira de la cámara
     this.cameraControl.target = look;
-  }
-  
-  createGround () {
-    // Una figura es un Mesh
-    var ground = new THREE.Mesh ();
-    // Un Mesh se compone de geometría y material
-    ground.geometry = new THREE.BoxGeometry (50,0.2,50);
-    // Las primitivas básicas se crean centradas en el origen
-    // Se puede modificar su posición con respecto al sistema de coordenadas local con una transformación aplicada directamente a la geometría.
-    ground.geometry.applyMatrix (new THREE.Matrix4().makeTranslation(0,-0.1,0));
-    // Como material se crea uno a partir de una textura
-    var texture = new THREE.TextureLoader().load('../imgs/wood.jpg');
-    ground.material = new THREE.MeshPhongMaterial ({map: texture});
-    // Por último se añade el suelo a la escena
-    this.add (ground);
   }
   
   createGUI () {
@@ -151,7 +156,7 @@ class MyScene extends THREE.Scene {
     this.axis.visible = this.guiControls.axisOnOff;
     
     // Se actualiza la posición de la cámara según su controlador
-    this.cameraControl.update();
+	this.cameraControl.update();
     this.model.update();
     // Se actualiza el resto del modelo
   }
