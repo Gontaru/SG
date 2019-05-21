@@ -8,6 +8,7 @@ class MyScene extends THREE.Scene {
   constructor (unRenderer) {
     super();
 	
+	//cubemap
     var path = "../Practica_2/imgs/";
 	var format = '.jpg';
 	var urls = [
@@ -18,7 +19,7 @@ class MyScene extends THREE.Scene {
 	
 	var textureCube = new THREE.CubeTextureLoader().load(urls);
 	
-	var shader = THREE.ShaderLib[ "cube" ];
+	/*var shader = THREE.ShaderLib[ "cube" ];
 	shader.uniforms[ "tCube" ].value = textureCube;
 	
 	var material = new THREE.ShaderMaterial ( {
@@ -27,11 +28,12 @@ class MyScene extends THREE.Scene {
 		uniforms: shader.uniforms,
 		depthWrite: false,
 		side: THREE.BackSide
-	});
-	
-	this.environmentMesh = new THREE.Mesh (new THREE.BoxGeometry( 10000, 10000, 10000), material );
-	
-	this.add(this.environmentMesh);
+	});*/
+	//var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
+	//this.environmentMesh = new THREE.Mesh (new THREE.BoxGeometry( 10000, 10000, 10000), material );
+	scene = new THREE.Scene();
+	scene.background = textureCube;
+	//this.add(this.environmentMesh);
     // Se añade a la gui los controles para manipular los elementos de esta clase
     this.createGUI ();
     
