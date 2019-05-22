@@ -3,12 +3,12 @@
 /**
  * Usaremos una clase derivada de la clase Scene de Three.js para llevar el control de la escena y de todo lo que ocurre en ella.
  */
+fin_partida = false;
 
 class MyScene extends THREE.Scene {
   constructor (unRenderer) {
     super();
 	
-	//cubemap
     var path = "../Practica_2/imgs/";
 	var format = '.jpg';
 	var urls = [
@@ -18,8 +18,10 @@ class MyScene extends THREE.Scene {
 	];
 	
 	var textureCube = new THREE.CubeTextureLoader().load(urls);
-	
-	/*var shader = THREE.ShaderLib[ "cube" ];
+
+	//MANERA DE HACERLO COMO EN LAS DIAPOSITIVAS
+	/*
+	var shader = THREE.ShaderLib[ "cube" ];
 	shader.uniforms[ "tCube" ].value = textureCube;
 	
 	var material = new THREE.ShaderMaterial ( {
@@ -28,12 +30,18 @@ class MyScene extends THREE.Scene {
 		uniforms: shader.uniforms,
 		depthWrite: false,
 		side: THREE.BackSide
-	});*/
-	//var material = new THREE.MeshBasicMaterial( { color: 0xffffff, envMap: textureCube } );
-	//this.environmentMesh = new THREE.Mesh (new THREE.BoxGeometry( 10000, 10000, 10000), material );
-	scene = new THREE.Scene();
-	scene.background = textureCube;
-	//this.add(this.environmentMesh);
+	});
+	
+	this.environmentMesh = new THREE.Mesh (new THREE.BoxGeometry( 10000, 10000, 10000), material );
+	
+
+	this.add(this.environmentMesh);
+	*/
+	//MANERA DE HACERLO COMO EN LAS DIAPOSITIVAS
+	//FIN
+
+	textureCube.format = THREE.RGBFormat;
+	this.background = textureCube;
     // Se añade a la gui los controles para manipular los elementos de esta clase
     this.createGUI ();
     
@@ -43,29 +51,37 @@ class MyScene extends THREE.Scene {
     // Tras crear cada elemento se añadirá a la escena con   this.add(variable)
     this.createLights();
     
-    // Tendremos una cámara con un control de movimiento con el ratón
-  //  this.createCamera (unRenderer);
-    
-    // Un suelo 
-  //  this.createGround ();
     
     // Y unos ejes. Imprescindibles para orientarnos sobre dónde están las cosas
-    this.axis = new THREE.AxesHelper (5);
+    this.axis = new THREE.AxesHelper (500);
     this.add (this.axis);
 
-    this.model = new NuestraNave();
+    this.model = new NuestraNave('naves/naveRebelde/nave_adapted/Arc170.mtl', 'naves/naveRebelde/nave_adapted/Arc170.obj');
     this.nave = new THREE.Object3D();
     this.nave.add(this.model);
     this.nave.rotation.y = -1.60;
     this.add(this.model);
     this.createCamera (unRenderer);
 
+    //MIENTRAS SIGA LA PARTIDA SE GENERAN NAVES ENEMIGAS
     /*while(!fin_partida){
         
     }*/
 
+    this.naveEnemiga = new Modelo('naves/naveImperio/TIE-fighter.mtl', 'naves/naveImperio/TIE-fighter.obj');
     
-    // Por último creamos la caja del ejemplo, como una instancia de una clase propia, que gestionará su creación y la interacción con la misma
+    //poner más grande modelo nave enemigal
+    this.naveEnemiga.scale.y = 10;
+    this.naveEnemiga.scale.x = 10;
+    this.naveEnemiga.scale.z = 10;    
+    this.naveEnemiga.position.x = 0.0;
+    this.naveEnemiga.position.z = 0.0;
+    this.naveEnemiga.position.y = 0.0;
+    this.add(this.naveEnemiga);
+
+    //AÑADIMOS UN RELOJ PARA VER CUANTO TIEMPO LLEVAMOS DE PARTIDA
+    this.reloj = new Reloj();
+
     }
   
   createCamera (unRenderer) {
@@ -75,7 +91,7 @@ class MyScene extends THREE.Scene {
     //   Los planos de recorte cercano y lejano
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
     // También se indica dónde se coloca
-    this.camera.position.set (this.nave.position.x,this.nave.position.y,-(window.innerWidth/2)/Math.tan(22.5 * Math.PI/180));
+    this.camera.position.set (this.nave.position.x,this.nave.position.y,-4 * ((window.innerWidth/2)/Math.tan(22.5 * Math.PI/180)));
     // Y hacia dónde mira
     var look = new THREE.Vector3 (this.nave.position.x,this.nave.position.y,this.nave.position.z);
 //    this.camera.getWorldPosition(look);
@@ -89,7 +105,7 @@ class MyScene extends THREE.Scene {
     this.camera.lookAt(target);*/
     this.add (this.camera);
     
-    // Para el control de cámara usamos una clase que ya tiene implementado los movimientos de órbita
+    //ESTO LUEGO LO QUITAREMOS, YA QUE NUESTRA CAMARA SERA FIJA
     this.cameraControl = new THREE.TrackballControls (this.camera, unRenderer);
     // Se configuran las velocidades de los movimientos
     this.cameraControl.rotateSpeed = 5;
@@ -157,9 +173,12 @@ class MyScene extends THREE.Scene {
     // Se muestran o no los ejes según lo que idique la GUI
     this.axis.visible = this.guiControls.axisOnOff;
     
-    // Se actualiza la posición de la cámara según su controlador
+    // ESTO AL FINAL SE QUITARA
 	this.cameraControl.update();
+	//UPDATE DE NUESTRA NAVE
     this.model.update();
+  	//EL RELOJ TENDRA QUE IR ACTUALIZANDO EL TIEMPO, SI PASAMOS FALSE SE PARA
+    this.reloj.update(true);
     // Se actualiza el resto del modelo
   }
 }
