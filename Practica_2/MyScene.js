@@ -1,4 +1,4 @@
-
+ 
 /// La clase fachada del modelo
 /**
  * Usaremos una clase derivada de la clase Scene de Three.js para llevar el control de la escena y de todo lo que ocurre en ella.
@@ -8,18 +8,16 @@ fin_partida = false;
 class MyScene extends THREE.Scene {
   constructor (unRenderer) {
     super();
-	
-	//crear array para generar naves enemigas
-	this.navesEnemigasArray = Array();
-	//limite naves enemigas al mismo tiempo
-	this.limiteNavesEnemigas = 3;
-	//minimo naves enemigas
-	this.minimoNavesEnemigas = 0;
-	//limites mapa
-	this.anchoMapa = 500;
-	this.altoMapa = 500;
-	
 
+    //crear array para generar naves enemigas
+    this.navesEnemigasArray = Array();
+    //limite naves enemigas al mismo tiempo
+    this.limiteNavesEnemigas = 3;
+    //minimo naves enemigas
+    this.minimoNavesEnemigas = 0;
+    //limites mapa
+    this.anchoMapa = 5000;
+    this.altoMapa = 5000;
 	
     var path = "../Practica_2/imgs/";
 	var format = '.jpg';
@@ -30,6 +28,27 @@ class MyScene extends THREE.Scene {
 	];
 	
 	var textureCube = new THREE.CubeTextureLoader().load(urls);
+
+	//MANERA DE HACERLO COMO EN LAS DIAPOSITIVAS
+	/*
+	var shader = THREE.ShaderLib[ "cube" ];
+	shader.uniforms[ "tCube" ].value = textureCube;
+	
+	var material = new THREE.ShaderMaterial ( {
+		fragmentShader: shader.fragmentShader,
+		vertexShader: shader.vertexShader,
+		uniforms: shader.uniforms,
+		depthWrite: false,
+		side: THREE.BackSide
+	});
+	
+	this.environmentMesh = new THREE.Mesh (new THREE.BoxGeometry( 10000, 10000, 10000), material );
+	
+
+	this.add(this.environmentMesh);
+	*/
+	//MANERA DE HACERLO COMO EN LAS DIAPOSITIVAS
+	//FIN
 
 	textureCube.format = THREE.RGBFormat;
 	this.background = textureCube;
@@ -53,24 +72,23 @@ class MyScene extends THREE.Scene {
     this.nave.rotation.y = -1.60;
     this.add(this.model);
     this.createCamera (unRenderer);
-	
-	//nave enemiga
-	this.model2 = new NaveEnemiga('naves/naveImperio/TIE-fighter.mtl', 'naves/naveImperio/TIE-fighter.obj');
-	this.enemiga = new THREE.Object3D();
-	this.enemiga.add(this.model2);
-	//aquí posición inicial
-		//this.model2.scale.set (10000, 10000, 10000);   
-		this.model2.position.x = 0.0;
-		this.model2.position.z = 3000.0;
-		this.model2.position.y = 0.0;
-
-	this.add(this.model2);
-	
 
     //MIENTRAS SIGA LA PARTIDA SE GENERAN NAVES ENEMIGAS
     /*while(!fin_partida){
         
     }*/
+
+    this.naveEnemiga = new Modelo('naves/naveImperio/TIE-fighter.mtl', 'naves/naveImperio/TIE-fighter.obj');
+    
+    //poner más grande modelo nave enemigal
+    this.naveEnemiga.scale.y = 10;
+    this.naveEnemiga.scale.x = 10;
+    this.naveEnemiga.scale.z = 10;    
+    this.naveEnemiga.position.x = 0.0;
+    this.naveEnemiga.position.z = 0.0;
+    this.naveEnemiga.position.y = 0.0;
+   // this.add(this.naveEnemiga);
+    this.add(this.navesEnemigasArray);
 
     //AÑADIMOS UN RELOJ PARA VER CUANTO TIEMPO LLEVAMOS DE PARTIDA
     this.reloj = new Reloj();
@@ -84,7 +102,7 @@ class MyScene extends THREE.Scene {
     //   Los planos de recorte cercano y lejano
     this.camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
     // También se indica dónde se coloca
-    this.camera.position.set (this.nave.position.x,this.nave.position.y,-4 * ((window.innerWidth/2)/Math.tan(22.5 * Math.PI/180)));
+    this.camera.position.set (this.nave.position.x,this.nave.position.y,/*-4 * ((window.innerWidth/2)/Math.tan(22.5 * Math.PI/180))*/-5000);
     // Y hacia dónde mira
     var look = new THREE.Vector3 (this.nave.position.x,this.nave.position.y,this.nave.position.z);
 //    this.camera.getWorldPosition(look);
@@ -157,34 +175,43 @@ class MyScene extends THREE.Scene {
     this.camera.aspect = ratio;
     this.camera.updateProjectionMatrix();
   }
-  
+
   animate() {
-	  this.model.animateBullets(this.navesEnemigasArray);
-	  this.crearNavesEnemigas();
-	  this.navesEnemigasArray.forEach(function(naves) {
-		  naves.animateEnemiga();
-	});
+      this.model.animateBullets(this.navesEnemigasArray);
+   //   this.crearNavesEnemigas();
+      this.navesEnemigasArray.forEach(function(naves) {
+          naves.animateEnemiga();
+    });
   }
-  
+
+  sleep(milliseconds) {
+      var start = new Date().getTime();
+      for (var i = 0; i < 1e7; i++) {
+        if ((new Date().getTime() - start) > milliseconds){
+          break;
+        }
+      }
+   }
+
   crearNavesEnemigas() {
-	  if( this.navesEnemigasArray.length < this.limiteNavesEnemigas && this.minimoNavesEnemigas <= 0 ) {
-		  var naves = new Nave({
-			  anchoMapa: this.anchoMapa,
-			  x: randNum(500) - 250,
-			  z: randNum(500) - 250,
-			  rotY: randNum(360)
-		  });
-		  
-		  this.navesEnemigasArray.push(naves);
-		  
-		  this.model2.add(this.navesEnemigasArray[this.navesEnemigasArray.length-1].nave);
-		  this.minimoNavesEnemigas = 200;
-		  //meter sonido por cada salida de una nave nueva
-		}
-		this.minimoNavesEnemigas--;
+
+    this.sleep(10000);
+      if( this.navesEnemigasArray.length < this.limiteNavesEnemigas && this.minimoNavesEnemigas <= 0 ) {
+          var naves = new NaveEnemiga({
+              anchoMapa: this.anchoMapa,
+              x: randNum(500) - 250,
+              z: randNum(500) - 250,
+              rotY: randNum(360)
+          },);
+         // this.add(naves);
+          this.navesEnemigasArray.push(naves);
+          
+         // this.model2.add(this.navesEnemigasArray[this.navesEnemigasArray.length-1].nave);
+          this.minimoNavesEnemigas = 200;
+          //meter sonido por cada salida de una nave nueva
+        }
+        this.minimoNavesEnemigas--;
   }
-  
-  
   
   update () {
     // Se actualizan los elementos de la escena para cada frame
@@ -201,17 +228,10 @@ class MyScene extends THREE.Scene {
   	//EL RELOJ TENDRA QUE IR ACTUALIZANDO EL TIEMPO, SI PASAMOS FALSE SE PARA
     this.reloj.update(true);
     // Se actualiza el resto del modelo
-	this.model2.update();
+    //this.crearNavesEnemigas();
+    
+    this.navesEnemigasArray.forEach(function(element){
+        element.update();
+    });
   }
 }
-
-/**
-  *Generar numeros aleatorios
-  * @param {Number} top - El mayor numero que haya
-  **/
-  
- 
-  //funcion generar posición aleatoria
-  function randNum(top) {
-	  return Math.floor(Math.random() * Math.floor(top));
-  }

@@ -14,7 +14,7 @@
 class NaveEnemiga extends THREE.Object3D {
  constructor(parametros){
 	super();
-	
+
 	//atributos
 	this.movimiento = true;
 	this.contador = 0;
@@ -38,10 +38,11 @@ class NaveEnemiga extends THREE.Object3D {
 		});
 		
 		this.naveEnemiga = new THREE.Mesh(this.object, this.materials);
-		
+
 		  //poner más grande modelo nave enemigal
 
 		this.naveEnemiga.scale.set (100, 100, 100);
+		this.naveEnemiga.position.z = 3000.0;
 		
 		this.add(this.naveEnemiga);
 	}
@@ -92,6 +93,7 @@ class NaveEnemiga extends THREE.Object3D {
   
  
  update(){
+ 	//this.animateEnemiga();
 	 //this.naveEnemiga.update();
  }
  

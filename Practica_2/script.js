@@ -122,11 +122,15 @@ $(function () {
   $("#WebGL-output").append(renderer.domElement);
   
   //IGUALAMOS LOS LIMITES DESPUES DE CREAR LA VENTANA
-  limiteDerecho=window.screen.width;
-  limiteIzquierdo=-(window.screen.width);
-  limiteSuperior=window.screen.height;
-  limiteInferior=-(window.screen.height);
 
+  //limiteSuperior=window.screen.height;
+  limiteSuperior=Math.tan(22.5 * Math.PI/180)*5000;
+  limiteInferior=-limiteSuperior;
+  /*var h = limiteSuperior*Math.tan(22.5 * Math.PI/180);
+  var b = Math.sqrt(Math.pow(limiteSuperior,2) + Math.pow(5000,2));
+  var a =  Math.sqrt( Math.pow(limiteSuperior,2)+Math.pow(h,2));*/
+  limiteDerecho= limiteSuperior * (window.innerWidth/window.innerHeight);
+  limiteIzquierdo=-limiteDerecho;
   // listeners
   // Cada vez que el usuario cambie el tamaño de la ventana se llama a la función que actualiza la cámara y el renderer
   window.addEventListener ("resize", onWindowResize);
