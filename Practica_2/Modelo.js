@@ -1,11 +1,12 @@
-misBalas=[];
+
 class Modelo extends THREE.Object3D {
 	constructor(mtl, obj){
 	super();
-//	this.misBalas = [];
+	this.vidas = 1;
+	this.misBalas = [];
 	var that = this;
 	var loader = new THREE.OBJLoader2();
-	
+	this.radio = 500;
 	loader.loadMtl(mtl , null ,
 		function(materials){
 			loader.setMaterials( materials);
@@ -18,6 +19,11 @@ class Modelo extends THREE.Object3D {
 
 		this.porche = new THREE.Mesh(this.object, this.materials);
 		this.add(this.porche);
+		var geometry = new THREE.BoxGeometry( 100, 100, 100 );
+		var material = new THREE.MeshBasicMaterial( {color: 0x03FE2F} );
+		var cube = new THREE.Mesh( geometry, material );
+		cube.position.x = 500;
+		this.add(cube);
 	}
 	//Creamos la bala que será añadida a la escena, sino seguirá el movimiento de nuestra nave
 	disparar(scene){
@@ -32,32 +38,51 @@ class Modelo extends THREE.Object3D {
 
 		scene.add(bala);
 		
-		misBalas.push(bala);
+		this.misBalas.push(bala);
 		
 
 	}
 	//La desplazamos por la escena
-	desplazarBalas(){
-		misBalas.forEach(function(element){
+	desplazarBalas(balas){
+		balas.forEach(function(element){
 			element.position.z+=50;
 		});
 	}
+	getBalas(){
+		return this.misBalas;
+	}
 	//Borramos las que se pierden ya que no queremos acumular figuras por la escena
-	balasPerdidas(){
+	balasPerdidas(balas){
 		var pos;
 		var elementoEliminado;
 		//RECORREMOS EL ARRAY
-		misBalas.forEach(function(element){
+		balas.forEach(function(element){
 			if(element.position.z > 10000){
-				pos = misBalas.indexOf(element);
-				elementoEliminado = misBalas.splice(pos, 1); 
+				pos = balas.indexOf(element);
+				elementoEliminado = balas.splice(pos, 1); 
 			}
 		});
 	}
+
+	impacto(scene){
+		this.vidas--;
+		if(this.vidas == 0){
+			scene.remove.this;
+		}
+	}
+	getX(){
+		return this.position.x;
+	}
+	getY(){
+		return this.position.y;
+	}
+	getZ(){
+		return this.position.z;
+	}
 	
 	update(){
-		this.desplazarBalas();
-		this.balasPerdidas();
+		this.desplazarBalas(this.misBalas);
+		this.balasPerdidas(this.misBalas);
 
 
 	}

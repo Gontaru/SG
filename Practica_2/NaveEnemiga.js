@@ -18,7 +18,7 @@ class NaveEnemiga extends THREE.Object3D {
 	//atributos
 	this.movimiento = true;
 	this.contador = 0;
-	this.limitemov = randNum(100) + 50;
+	this.limitemov = Math.floor((Math.random() * 100) + 50);
 	this.fadeCont = 0;
 	this.tiempoParaVolver = false;
 	//limite
