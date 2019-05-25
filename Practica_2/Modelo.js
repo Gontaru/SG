@@ -4,9 +4,12 @@ class Modelo extends THREE.Object3D {
 	super();
 	this.vidas = 1;
 	this.misBalas = [];
+	this.radio = 500;
+	this.navesDestruidas = 0;
+
 	var that = this;
 	var loader = new THREE.OBJLoader2();
-	this.radio = 500;
+
 	loader.loadMtl(mtl , null ,
 		function(materials){
 			loader.setMaterials( materials);
@@ -17,24 +20,20 @@ class Modelo extends THREE.Object3D {
 					} , null , null , null , false );
 		});
 
-		this.porche = new THREE.Mesh(this.object, this.materials);
-		this.add(this.porche);
-		var geometry = new THREE.BoxGeometry( 100, 100, 100 );
-		var material = new THREE.MeshBasicMaterial( {color: 0x03FE2F} );
-		var cube = new THREE.Mesh( geometry, material );
-		cube.position.x = 500;
-		this.add(cube);
+		this.modelo = new THREE.Mesh(this.object, this.materials);
+		this.add(this.modelo);
+		
 	}
 	//Creamos la bala que será añadida a la escena, sino seguirá el movimiento de nuestra nave
 	disparar(scene){
 		var cilindro = new THREE.CylinderGeometry( 7, 6, 40, 32);
 		var material = new THREE.MeshBasicMaterial( {color: 0xF8FF00 } );
 		var bala = new THREE.Mesh( cilindro, material );
-		var light = new THREE.PointLight( 0xFE9303, 1, 100 );
+	//	var light = new THREE.PointLight( 0xFE9303, 1, 100 );
 		bala.position.x = this.position.x;
 		bala.position.y = this.position.y;
 		bala.rotation.x = 1.505;
-		bala.add(light);
+	//	bala.add(light);
 
 		scene.add(bala);
 		
@@ -56,19 +55,30 @@ class Modelo extends THREE.Object3D {
 		var pos;
 		var elementoEliminado;
 		//RECORREMOS EL ARRAY
+		/*for(var i=0; i<this.misBalas.length; i++){
+			if(this.misBalas[i].position.z > 12000){
+				this.misBalas[i].visible(false);
+				elementoEliminado = this.misBalas.splice(i, 1); 
+			}
+		}*/
 		balas.forEach(function(element){
-			if(element.position.z > 10000){
+			if(element.position.z > 20500){
 				pos = balas.indexOf(element);
-				elementoEliminado = balas.splice(pos, 1); 
+				balas.splice(pos, 1);
+				element.visible = false;
 			}
 		});
 	}
 
 	impacto(scene){
+		console.log("IMPACTO!!!");
 		this.vidas--;
 		if(this.vidas == 0){
-			scene.remove.this;
+			console.log("NAVE DESTRUIDA!!");
+			this.visible = false;
+			return true;
 		}
+		return false;
 	}
 	getX(){
 		return this.position.x;

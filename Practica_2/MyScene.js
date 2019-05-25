@@ -68,14 +68,14 @@ class MyScene extends THREE.Scene {
     this.axis = new THREE.AxesHelper (500);
     this.add (this.axis);
 
-    this.model = new NuestraNave('naves/naveRebelde/nave_adapted/Arc170.mtl', 'naves/naveRebelde/nave_adapted/Arc170.obj');
+    this.naveProta = new NuestraNave('naves/naveRebelde/nave_adapted/Arc170.mtl', 'naves/naveRebelde/nave_adapted/Arc170.obj');
     this.nave = new THREE.Object3D();
-    this.nave.add(this.model);
+    this.nave.add(this.naveProta);
     this.nave.rotation.y = -1.60;
-    this.add(this.model);
+    this.add(this.naveProta);
     this.createCamera (unRenderer);
 
-    this.navesEscena.push(this.model);
+    this.navesEscena.push(this.naveProta);
     //MIENTRAS SIGA LA PARTIDA SE GENERAN NAVES ENEMIGAS
     /*while(!fin_partida){
         
@@ -93,6 +93,7 @@ class MyScene extends THREE.Scene {
     this.naveEnemiga.position.x = -1500.0;
     this.naveEnemiga.position.z = 6500.0;
     this.naveEnemiga.position.y = 0.0;
+    this.navesEscena.push(this.naveEnemiga);
     this.add(this.naveEnemiga);
   //  this.add(this.navesEscena);
 
@@ -183,7 +184,7 @@ class MyScene extends THREE.Scene {
   }
 
   animate() {
-      this.model.animateBullets(this.navesEscena);
+      this.naveProta.animateBullets(this.navesEscena);
    //   this.crearNavesEnemigas();
       this.navesEscena.forEach(function(naves) {
           naves.animateEnemiga();
@@ -199,15 +200,15 @@ class MyScene extends THREE.Scene {
       }
    }
 	crearNavesEnemigas() {
-  	  this.sleep(10000);
+  	  this.sleep(20000);
       if( this.navesEscena.length < this.limiteNavesEnemigas && this.minimoNavesEnemigas <= 0 ) {
           var naves = new Modelo('naves/naveImperio/TIE-fighter.mtl', 'naves/naveImperio/TIE-fighter.obj');
-          naves.position.x =0.0; //Math.floor(2*(Math.random() * this.limiteHori) + 1) -this.limiteHori;
-		  naves.position.z =0.0; //Math.floor(2*(Math.random() * this.limiteVert) + 1) -this.limiteVert;
-         // this.add(naves);
+          naves.position.x = Math.floor(2*(Math.random() * this.limiteHori) + 1) -this.limiteHori;
+		  naves.position.z = Math.floor(2*(Math.random() * 10000) + 1);
+		  naves.position.y = Math.floor(2*(Math.random() * this.limiteVert) + 1) -this.limiteVert;
+
           this.navesEscena.push(naves);
           this.add(naves);
-         // this.model2.add(this.navesEscena[this.navesEscena.length-1].nave);
           this.minimoNavesEnemigas = 200;
           //meter sonido por cada salida de una nave nueva
         }
@@ -215,10 +216,10 @@ class MyScene extends THREE.Scene {
         console.log("NAVE ENEMIGA CREADA");
   	}
 
-  	distancia(objeto1, objeto2){
+	distancia(x1,y1,z1, x2,y2,z2){
   		//añadir formula distancia vectores3D
-  		return Math.abs(Math.sqrt( (Math.pow(objeto1.position.x-objeto2.position.x, 2)) + Math.pow(objeto1.position.y-objeto2.position.y, 2)	+
-  			Math.pow(objeto1.position.z-objeto2.position.z, 2)));
+  		return Math.abs(Math.sqrt( Math.pow(x1-x2, 2) + Math.pow(y1-y2, 2) + Math.pow(z1-z2, 2)));
+  	
   	}
 
   	detectarImpactoEnemigo(nave){
@@ -228,8 +229,14 @@ class MyScene extends THREE.Scene {
     	   		var balas = this.navesEscena[x].getBalas();
     		
     			for (var i=0; i<balas.length; i++){
-    				if(this.distancia(nave, balas[i]) <= this.distancia(nave.radio, nave)){
-    					nave.impacto(this);
+    				if(this.distancia(nave.position.x, nave.position.y, nave.position.z, balas[i].position.x, balas[i].position.y, balas[i].position.z) 
+    					<= this.distancia(nave.position.x+nave.radio, nave.position.y+nave.radio, nave.position.z+nave.radio, nave.position.x, nave.position.y, nave.position.z)){
+    					this.remove(balas[i]);
+    					if(nave.impacto(this)){
+    						this.remove(nave);
+    						this.navesEscena.splice(i,1);
+    						this.naveProta.navesDestruidas++;
+    					}
     				}  			
     			}
     		} 
@@ -258,6 +265,8 @@ class MyScene extends THREE.Scene {
   }
   */
   update () {
+  	    //console.log("POSICION NAVE ENMIGA XYZ : "+this.naveEnemiga.position.x+" "+this.naveEnemiga.position.y+" "+this.naveEnemiga.position.z);
+
     // Se actualizan los elementos de la escena para cada frame
     // Se actualiza la intensidad de la luz con lo que haya indicado el usuario en la gui
     this.spotLight.intensity = this.guiControls.lightIntensity;
@@ -276,15 +285,15 @@ class MyScene extends THREE.Scene {
     if(!creandoNaveEnemiga){
     	creandoNaveEnemiga=true;
     	this.crearNavesEnemigas();
+       //	creandoNaveEnemiga=false;
     }
    
-   // this.navesEscena.forEach(function(element){
     for (var x=0;x<this.navesEscena.length;x++){
-    	this.detectarImpactoEnemigo(this.navesEscena[x]);
-    	this.navesEscena[x].update();
+    	if(this.navesEscena[x] != null){
+    		this.detectarImpactoEnemigo(this.navesEscena[x]);
+    		this.navesEscena[x].update();
+    	}
     }
-    
-    //});
-    
+        
   }
 }
