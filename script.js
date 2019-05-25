@@ -217,6 +217,46 @@ function onDocumentKeyDown(event) {
 
 }
 
+//CREACIÓN DE EL MENÚ DEL JUEGO
+
+function crearMenu() {
+	//crear cuadrado (div) que será el menú donde estan las distintas opciones
+	var contenedorPantallaCompleta = $ ('#contenedorPantallaCompleta')
+	//añadimos color y transparencia
+	.addClass('w3-contenedor w3-blue')
+	//pantalla completa!
+	.css ({
+		'height': '100vh',
+		'width': '100vw',
+		/*
+		Un elemento fixed (fijo) se posiciona a la ventana 
+		del navegador de manera relativa, lo que significa que se 
+		mantendrá en el mismo lugar incluso después de hacer 
+		scroll en la página.
+		*/
+		'position': 'fixed',
+		'z-index': '10',
+		'top': '0',
+		'opacity': '0.85'
+	}).hide();
+	
+	//titulo y botones
+	var menu =[{
+		headingText: 'Space WAR',
+		buttonsArray: [
+		/*hay que añadir, y la funcion que realice el botn*/
+		{text: 'Jugar'},
+		{text:'Instrucciones'},
+		{text:'Opciones'},
+		]
+	}
+	/*añadir el heading text de cada accion*/
+	];
+	
+	
+}
+
+
 /// La función principal
 $(function () {
   // Se crea el renderer
@@ -248,7 +288,11 @@ $(function () {
   // Se crea la escena. La escena es una instancia de nuestra propia clase encargada de crear y gestionar todos los elementos que intervienen en la escena.
   scene = new MyScene (renderer.domElement, limiteSuperior, limiteDerecho);
   
+  //agregamos el menú de inicio
+  crearMenu();
+ 
   // Finalmente, realizamos el primer renderizado.
   render();
   //console.log("VALORES SCREEN : "+ window.screen.width+" "+window.screen.height);
 });
+
