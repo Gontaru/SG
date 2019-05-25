@@ -233,8 +233,8 @@ function onDocumentKeyDown(event) {
 }
 
 //funcion iniciar juego
-function Jugar(mapa = 'fondo_espacial'){
-	tog
+function Jugar(){
+	scene = new TheScene(renderer.domElement);
 }
 
 
@@ -280,7 +280,7 @@ function crearMenu() {
 		headingText: 'Space WAR',
 		buttonsArray: [
 		/*hay que añadir, y la funcion que realice el botn*/
-		{text: 'Jugar'},
+		{text: 'Jugar', func:'jugar()'},
 		{text:'Instrucciones'},
 		{text:'Opciones'},
 		]
