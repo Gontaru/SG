@@ -11,6 +11,7 @@ gui = null;
 
 Speed = 100;
 
+var keys = {arriba: false, abajo:false, derecha:false, izquierda:false, espacio:false }; 
 limiteDerecho=null;
 limiteIzquierdo=null;
 limiteSuperior=null;
@@ -62,45 +63,148 @@ function onWindowResize () {
   renderer.setSize (window.innerWidth, window.innerHeight);
   
 }
+
+function onDocumentKeyUp(event){
+  var keyCode = event.which || event.keyCode;
+  //PONEMOS A FALSE LAS TECLAS LEVANTADAS DE NUESTRO ARRAY
+  if(keyCode == 87){
+    keys["arriba"] = false;
+  }
+  else if(keyCode == 83){
+    keys["abajo"] = false;
+  }
+  else if(keyCode == 65){
+    keys["derecha"] = false;
+  }
+  else if(keyCode == 68){
+    keys["izquierda"] = false;
+  }
+  else if(keyCode == 32){
+    keys["espacio"] = false;
+  }
+}
+
+function onDocumentKeyPress(event){
+  var keyCode = event.which ||event.keyCode;
+  if(keyCode == 32){
+        scene.naveProta.disparar(scene);
+  }
+}
+
 //Añadimos un listener al script para desplazar nuestra nave por el mapa
 function onDocumentKeyDown(event) {
 
     var keyCode = event.which || event.keyCode;
-    //MOVERSE HACIA ARRIBA
-    if (keyCode == 87) {
+
+    //PONEMOS A TRUE LAS TECLAS PULSADAS EN NUESTRO ARRAY
+    if(keyCode == 87){
+    keys["arriba"] = true;
+    }
+    else if(keyCode == 83){
+      keys["abajo"] = true;
+    }
+    else if(keyCode == 65){
+      keys["derecha"] = true;
+    }
+    else if(keyCode == 68){
+      keys["izquierda"] = true;
+    }
+    else if(keyCode == 32){
+      keys["espacio"] = true;
+    }
+
+//DOS TELCAS PULSADAS
+    //ARRIBA E IZQDA
+    
+    if (keys["arriba"] == true && keys["derecha"] == true) {
       if(DespSuperior < limiteSuperior){
-        console.log("Valores de desp y limS: "+DespSuperior+" "+limiteSuperior);
         DespSuperior+=Speed;
-        scene.model.position.y += Speed;
+        scene.naveProta.position.y += Speed;
+        DespInferior+=Speed;
+      }
+      if(DespDerecho < limiteDerecho){
+        DespDerecho+=Speed;
+        scene.naveProta.position.x += Speed;
+        DespIzquierdo+=Speed;
+      }
+    //ARRIBA Y DERECHA  
+    }
+    else if (keys["arriba"] == true && keys["izquierda"] == true) {
+
+      if(DespSuperior < limiteSuperior){
+        DespSuperior+=Speed;
+        scene.naveProta.position.y += Speed;
+        DespInferior+=Speed;
+      }
+      if(DespIzquierdo > limiteIzquierdo){ 
+          DespIzquierdo-=Speed; 
+          scene.naveProta.position.x -= Speed;
+          DespDerecho-=Speed;
+        }
+    //MOVERSE HACIA ABAJO Y DERECHA    
+    } 
+    else if (keys["abajo"] == true && keys["derecha"] == true) {
+
+      if(DespInferior > limiteInferior){
+        DespInferior-=Speed;
+        scene.naveProta.position.y -= Speed;
+        DespSuperior-=Speed;
+      }
+      if(DespDerecho < limiteDerecho){
+        DespDerecho+=Speed;
+        scene.naveProta.position.x += Speed;
+        DespIzquierdo+=Speed;
+      }
+    //MOVERSE HACIA ABAJO E IZQDA    
+    }
+    else if (keys["abajo"] == true && keys["izquierda"] == true) {
+      if(DespInferior > limiteInferior){
+        DespInferior-=Speed;
+        scene.naveProta.position.y -= Speed;
+        DespSuperior-=Speed;
+      }
+      if(DespIzquierdo > limiteIzquierdo){ 
+          DespIzquierdo-=Speed; 
+          scene.naveProta.position.x -= Speed;
+          DespDerecho-=Speed;
+      }
+    }
+    
+    //MOVERSE HACIA ARRIBA
+    else if (keys["arriba"] == true) {
+      if(DespSuperior < limiteSuperior){
+        DespSuperior+=Speed;
+        scene.naveProta.position.y += Speed;
         DespInferior+=Speed;
       }
     //MOVERSE HACIA ABAJO    
-    } else if (keyCode == 83) {
+    } else if (keys["abajo"] == true) {
       if(DespInferior > limiteInferior){
-        console.log("Valores de desp y limS: "+DespInferior+" "+limiteInferior);
         DespInferior-=Speed;
-        scene.model.position.y -= Speed;
+        scene.naveProta.position.y -= Speed;
         DespSuperior-=Speed;
       }
-    //MOVERSE HACIA LA DERECHA
-    } else if (keyCode == 65) {
+    //MOVERSE HACIA LA DERECHA 65
+    } else if (keys["derecha"] == true) {
       if(DespDerecho < limiteDerecho){
         DespDerecho+=Speed;
-        scene.model.position.x += Speed;
+        scene.naveProta.position.x += Speed;
         DespIzquierdo+=Speed;
       }
-    //MOVERSE HACIA LA IZQDA
-    } else if (keyCode == 68) {
+    //MOVERSE HACIA LA IZQDA 68
+    } else if (keys["izquierda"] == true) {
         if(DespIzquierdo > limiteIzquierdo){ 
           DespIzquierdo-=Speed; 
-          scene.model.position.x -= Speed;
+          scene.naveProta.position.x -= Speed;
           DespDerecho-=Speed;
         }
     //SI PULSAMOS EL ESPACIO NUESTRA NAVE DISPARA
     }
-     else if (keyCode == 32) {
-        scene.model.disparar(scene);
-    }
+
+/*
+    if (keys["espacio"] == true) {
+        scene.naveProta.disparar(scene);
+    }*/
     //SI PULSAMOS LA T OBTENEMOS EL TIEMPO TRANSCURRIDO
     else if(keyCode == 84){
         scene.reloj.getTiempo();
@@ -108,7 +212,7 @@ function onDocumentKeyDown(event) {
     //PRUEBA PARA VER COMO SE ELIMINA UNA FIGURA DE LA ESCENA 
     //LO USAREMOS PARA DESTRUIR LAS NAVES
     else if(keyCode == 88){
-        scene.remove(scene.model);
+        scene.remove(scene.naveProta);
     }
 
 }
@@ -135,6 +239,8 @@ $(function () {
   // Cada vez que el usuario cambie el tamaño de la ventana se llama a la función que actualiza la cámara y el renderer
   window.addEventListener ("resize", onWindowResize);
   window.addEventListener("keydown", onDocumentKeyDown, false);
+  window.addEventListener("keyup", onDocumentKeyUp, false);
+  window.addEventListener("keypress", onDocumentKeyPress, false);
 
   // Se crea una interfaz gráfica de usuario vacia
   gui = new dat.GUI();
