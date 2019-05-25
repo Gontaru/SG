@@ -9,6 +9,21 @@ renderer = null;
 /// El objeto que referencia a la interfaz gráfica de usuario
 gui = null;
 
+//contenido del menu
+var cMenu = null;
+//array parta el menu
+var menuArray = [];
+//estado del juego
+var menuActual = null;
+/**
+*@enum - posibilidades del menu
+*/
+const Menus = {
+	PRINCIPAL: 0,
+	INSTRUCIONES: 1,
+	OPCIONES: 2,
+};
+
 Speed = 100;
 
 var keys = {arriba: false, abajo:false, derecha:false, izquierda:false, espacio:false }; 
@@ -217,6 +232,94 @@ function onDocumentKeyDown(event) {
 
 }
 
+//funcion iniciar juego
+function Jugar(mapa = 'fondo_espacial'){
+	tog
+}
+
+
+
+/**
+ * @param {Menu} menuId - id's del array del menu
+ */
+//mostrar menú del juego
+function opcionesMenu(menuId = Menus.PRINCIPAL){
+	if(menuActual != null)
+		menuArray[menuActual].hide();
+	//muestra el menú con id....
+		$('#contenedorPantallaCompleta').show();
+		menuArray[menuId].show();
+		
+}
+
+//CREACIÓN DE EL MENÚ DEL JUEGO
+
+function crearMenu() {
+	//crear cuadrado (div) que será el menú donde estan las distintas opciones
+	var contenedorPantallaCompleta = $ ('#contenedorPantallaCompleta')
+	//añadimos color y transparencia
+	.addClass('w3-contenedor w3-blue')
+	//pantalla completa!
+	.css ({
+		'height': '100vh',
+		'width': '100vw',
+		/*
+		Un elemento fixed (fijo) se posiciona a la ventana 
+		del navegador de manera relativa, lo que significa que se 
+		mantendrá en el mismo lugar incluso después de hacer 
+		scroll en la página.
+		*/
+		'position': 'fixed',
+		'z-index': '10',
+		'top': '0',
+		'opacity': '0.85'
+	}).hide();
+	
+	//titulo y botones
+	var menu =[{
+		headingText: 'Space WAR',
+		buttonsArray: [
+		/*hay que añadir, y la funcion que realice el botn*/
+		{text: 'Jugar'},
+		{text:'Instrucciones'},
+		{text:'Opciones'},
+		]
+	}
+	/*añadir el heading text de cada accion*/
+	];
+	
+	//para cada menu, agregar al html
+	menu.forEach(function(contenidoMenu){
+		//cuadrado menú
+		var cMenu = $('<form>').addClass(
+			'menu w3-contenedor w3-text-light-grey w3-center w3-display-middle w3-quarter'
+			);
+		contenedorPantallaCompleta.append(cMenu);
+	//Añadir las etiquetas del menu
+	cMenu.append(
+		$('<label>').text(contenidoMenu.headingText)
+		.addClass(
+			'w3-xxlarge w3-margin-bottom w3-panel w3-block w3-round-large w3-teal'
+		)
+	);
+	//añadir los botones al menu
+	contenidoMenu.buttonsArray.forEach(function(boton){
+		cMenu.append(
+			$('<input>').attr({
+				'id': (boton.id == undefined? '': boton.id),
+				'value': boton.text,
+				'onmouseup': boton.func,
+				'type': 'button'
+			}).addClass('mybutton')
+		);
+	});
+	menuArray.push(cMenu.hide());
+	
+	});
+	
+}
+
+
 /// La función principal
 $(function () {
   // Se crea el renderer
@@ -248,7 +351,11 @@ $(function () {
   // Se crea la escena. La escena es una instancia de nuestra propia clase encargada de crear y gestionar todos los elementos que intervienen en la escena.
   scene = new MyScene (renderer.domElement, limiteSuperior, limiteDerecho);
   
+  //agregamos el menú de inicio
+  crearMenu();
+  opcionesMenu(Menus.PRINCIPAL);
   // Finalmente, realizamos el primer renderizado.
   render();
   //console.log("VALORES SCREEN : "+ window.screen.width+" "+window.screen.height);
 });
+

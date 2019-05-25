@@ -81,15 +81,15 @@ class MyScene extends THREE.Scene {
         
     }*/
 
-    this.naveEnemiga = new Modelo('naves/naveImperio/TIE-fighter.mtl', 'naves/naveImperio/TIE-fighter.obj');
+    this.naveEnemiga = new Modelo('naves/naveImperio/naveImperio.mtl', 'naves/naveImperio/naveImperio.obj');
     
     //poner más grande modelo nave enemigal
     this.naveEnemiga.position.x = 0.0;
     this.naveEnemiga.position.z = 0.0;
     this.naveEnemiga.position.y = 0.0;
-    this.naveEnemiga.scale.y = 10;
-    this.naveEnemiga.scale.x = 10;
-    this.naveEnemiga.scale.z = 10;    
+    this.naveEnemiga.scale.y = 4;
+    this.naveEnemiga.scale.x = 4;
+    this.naveEnemiga.scale.z = 4;    
     this.naveEnemiga.position.x = -1500.0;
     this.naveEnemiga.position.z = 6500.0;
     this.naveEnemiga.position.y = 0.0;
@@ -202,7 +202,7 @@ class MyScene extends THREE.Scene {
 	crearNavesEnemigas() {
   	  this.sleep(20000);
       if( this.navesEscena.length < this.limiteNavesEnemigas && this.minimoNavesEnemigas <= 0 ) {
-          var naves = new Modelo('naves/naveImperio/TIE-fighter.mtl', 'naves/naveImperio/TIE-fighter.obj');
+          var naves = new Modelo('naves/naveImperio/naveImperio.mtl', 'naves/naveImperio/naveImperio.obj');
           naves.position.x = Math.floor(2*(Math.random() * this.limiteHori) + 1) -this.limiteHori;
 		  naves.position.z = Math.floor(2*(Math.random() * 10000) + 1);
 		  naves.position.y = Math.floor(2*(Math.random() * this.limiteVert) + 1) -this.limiteVert;
