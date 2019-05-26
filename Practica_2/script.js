@@ -15,6 +15,14 @@ var cMenu = null;
 var menuArray = [];
 //estado del juego
 var menuActual = null;
+//primera vez que se ejecuta la funcion jugar
+var firstTime = true;
+//estado pantalla
+var showStatus = true;
+//menu anterior
+var menuprevio = null;
+savedTime = null;
+requestID = null;
 /**
 *@enum - posibilidades del menu
 */
@@ -228,13 +236,20 @@ function onDocumentKeyDown(event) {
     //LO USAREMOS PARA DESTRUIR LAS NAVES
     else if(keyCode == 88){
         scene.remove(scene.naveProta);
+		createGUI(true);
+        render();
     }
 
 }
 
 //funcion iniciar juego
-function Jugar(){
-	scene = new TheScene(renderer.domElement);
+function Jugar(pausa){
+	if(!requestID){
+		requestID = requestAnimationFrame(render);
+	}
+	if(pausa && this.scene.endTime !== null){
+		this.scene.endTime += Date.now() - savedTime;
+	}
 }
 
 
@@ -249,6 +264,9 @@ function opcionesMenu(menuId = Menus.PRINCIPAL){
 	//muestra el menú con id....
 		$('#contenedorPantallaCompleta').show();
 		menuArray[menuId].show();
+		//actualiza menu actual y anterior(para volver volver atras)
+		menuprevio = menuActual;
+		menuActual = menuId;
 		
 }
 
@@ -281,9 +299,20 @@ function crearMenu() {
 		buttonsArray: [
 		/*hay que añadir, y la funcion que realice el botn*/
 		{text: 'Jugar', func:'jugar()'},
-		{text:'Instrucciones'},
+		{text:'Instrucciones', func: 'opcionesMenu(Menus.INSTRUCIONES)'},
 		{text:'Opciones'},
-		]
+		],
+	},
+	{
+		headingText: 'Instrucciones',
+		image: {
+			src: './imgs/instrucciones.png',
+			title: 'Instrucciones',
+			alt: 'Instrucciones',
+		},
+		buttonsArray: [{
+			text: 'Atrás', func: 'opcionesMenu(menuprevio)'
+		}]
 	}
 	/*añadir el heading text de cada accion*/
 	];
@@ -313,9 +342,20 @@ function crearMenu() {
 			}).addClass('mybutton')
 		);
 	});
+	//para que se vea la imagen de instrucciones
+	if(contenidoMenu.image !== undefined)
+		cMenu.append(
+			$('<img>').attr({
+				'src': contenidoMenu.image.src,
+				'title': contenidoMenu.image.title,
+				'alt': contenidoMenu.image.alt,
+			}).width('100%').addClass('w3-margin-bottom w3-round-large')
+	);
+	
 	menuArray.push(cMenu.hide());
 	
 	});
+		
 	
 }
 
