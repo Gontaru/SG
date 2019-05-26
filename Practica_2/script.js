@@ -1,6 +1,11 @@
 
 /// La escena que tendrá todo lo que se tiene en cuenta al hacer un render
 //  Lo que no esté incluido en la escena no será procesado por el renderer
+/*
+La librería stats.js te permite controlar el uso de memoria de tu proyecto 
+en three.js, muy importante para no consumir excesivamente la memoria 
+mientras se ejecuta la animación.
+*/
 scene = null;
 comenzar_juego=false;
 /// La variable que referenciará al renderer
@@ -31,6 +36,20 @@ const Menus = {
 	INSTRUCIONES: 1,
 	OPCIONES: 2,
 };
+/**
+*@enum - posibilidades al jugat
+*/
+const estadoJuego = {
+	INICIAR: 0,
+	MENU_PRINCIPAL: 1,
+	PAUSA: 2,
+	JUGANDO: 3,
+	FIN: 4,
+	
+};
+
+//VARIABLE PARA CONTROLAR EL ESTADO DEL JUEGO
+var estadoActualJuego = null;
 
 Speed = 100;
 
@@ -44,6 +63,36 @@ DespDerecho=0.0;
 DespIzquierdo=0.0;
 DespSuperior=0.0;
 DespInferior=0.0;
+
+
+//metodos necesarios para el procesamiento de estadisticas con stats
+//Crea GUI, agrega informacion estadisticas
+/**
+*@param widthStats -booleano ara mostrar las estadisticas
+*/
+function createGUI(widthStats){
+	var gui = new dat.GUI();
+	//listener
+	if(widthStats)
+		stats = initStats();
+}
+//añade estadisticas despues de crer el div
+/**
+*@return The statistics object
+*/
+
+function initStats(){
+	var stats = new Stats();
+	stats.setMode(0); //0:fps, 1:ms
+	
+	//Aling top-left
+	stats.domElement.style.position = 'absolute';
+	stats.domElement.style.left = '0px';
+	stats.domElement.style.top = '0px';
+		$("#Stats-output").append(stats.domElement);
+		
+	return stats;
+}
 /// Se crea y configura un renderer WebGL
 /**
  * El renderer recorrerá el grafo de escena para procesarlo y crear la imagen resultante. 
@@ -243,22 +292,11 @@ function onDocumentKeyDown(event) {
 }
 
 //funcion iniciar juego
-function jugar(pausa){
-  console.log("JUGAAAAR");
-    comenzar_juego=true;
-
-	if(!requestID){
-		requestID = requestAnimationFrame(render);
-	}
-	if(pausa && this.scene.endTime !== null){
-		this.scene.endTime += Date.now() - savedTime;
-	}
-}
-/*
 function jugar(){
-  comenzar_juego=true;
+  console.log("JUGAAAAR");
+	requestAnimationFrame(render);
+	
 }
-*/
 
 
 /**
@@ -266,6 +304,17 @@ function jugar(){
  */
 //mostrar menú del juego
 function opcionesMenu(menuId = Menus.PRINCIPAL){
+	//ocultar menuActual
+	if(menuId === cMenu){
+		menuArray[menuId].hide();
+			$('#contenedorPantallaCompleta').show();
+			//actualizar
+		menuprevio = cMenu;
+		cMenu = null;
+	//mostrar el menu seleccionado y ocultar el anterior
+	//si el menuID está contenido dentrlo del enumerado Menus...
+	} else if ( menuId != 0 || menuId < menuArray.length){ 
+	//si el menuActual no es null, ocurlatrlo
 	if(menuActual != null)
 		menuArray[menuActual].hide();
 	//muestra el menú con id....
@@ -274,7 +323,10 @@ function opcionesMenu(menuId = Menus.PRINCIPAL){
 		//actualiza menu actual y anterior(para volver volver atras)
 		menuprevio = menuActual;
 		menuActual = menuId;
-		
+	}
+	if(cMenu === Menus.PRINCIPAL)
+		estadoActualJuego = estadoJuego.INICIAR;
+	
 }
 
 //CREACIÓN DE EL MENÚ DEL JUEGO
