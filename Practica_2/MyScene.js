@@ -5,6 +5,7 @@
  */
 fin_partida = false;
 creandoNaveEnemiga=false;
+frecuencia_naves = 10;
 
 class MyScene extends THREE.Scene {
   constructor (unRenderer, limiteV, limiteH) {
@@ -75,7 +76,7 @@ class MyScene extends THREE.Scene {
     this.add(this.naveProta);
     this.createCamera (unRenderer);
 
-    this.navesEscena.push(this.naveProta);
+   // this.navesEscena.push(this.naveProta);
     //MIENTRAS SIGA LA PARTIDA SE GENERAN NAVES ENEMIGAS
     /*while(!fin_partida){
         
@@ -99,7 +100,7 @@ class MyScene extends THREE.Scene {
 
     //AÑADIMOS UN RELOJ PARA VER CUANTO TIEMPO LLEVAMOS DE PARTIDA
     this.reloj = new Reloj();
-
+    this.cronometroCrearNaves = new Reloj();
     }
   
   createCamera (unRenderer) {
@@ -200,7 +201,6 @@ class MyScene extends THREE.Scene {
       }
    }
 	crearNavesEnemigas() {
-  	  this.sleep(20000);
       if( this.navesEscena.length < this.limiteNavesEnemigas && this.minimoNavesEnemigas <= 0 ) {
           var naves = new Modelo('naves/naveImperio/naveImperio.mtl', 'naves/naveImperio/naveImperio.obj');
           naves.position.x = Math.floor(2*(Math.random() * this.limiteHori) + 1) -this.limiteHori;
@@ -280,13 +280,15 @@ class MyScene extends THREE.Scene {
 //    this.model.update();
   	//EL RELOJ TENDRA QUE IR ACTUALIZANDO EL TIEMPO, SI PASAMOS FALSE SE PARA
     this.reloj.update(true);
+    this.cronometroCrearNaves.update(true);
     // Se actualiza el resto del modelo
     
-    if(!creandoNaveEnemiga){
-    	creandoNaveEnemiga=true;
-    	this.crearNavesEnemigas();
-       //	creandoNaveEnemiga=false;
+    if(this.cronometroCrearNaves.getSegundos()>frecuencia_naves){
+      this.crearNavesEnemigas();
+      this.cronometroCrearNaves.reinicio();
     }
+    this.naveProta.update();
+    this.detectarImpactoEnemigo( this.naveProta);
    
     for (var x=0;x<this.navesEscena.length;x++){
     	if(this.navesEscena[x] != null){

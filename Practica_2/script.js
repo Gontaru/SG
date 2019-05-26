@@ -2,7 +2,7 @@
 /// La escena que tendrá todo lo que se tiene en cuenta al hacer un render
 //  Lo que no esté incluido en la escena no será procesado por el renderer
 scene = null;
-
+comenzar_juego=false;
 /// La variable que referenciará al renderer
 renderer = null;
 
@@ -243,7 +243,10 @@ function onDocumentKeyDown(event) {
 }
 
 //funcion iniciar juego
-function Jugar(pausa){
+function jugar(pausa){
+  console.log("JUGAAAAR");
+    comenzar_juego=true;
+
 	if(!requestID){
 		requestID = requestAnimationFrame(render);
 	}
@@ -251,7 +254,11 @@ function Jugar(pausa){
 		this.scene.endTime += Date.now() - savedTime;
 	}
 }
-
+/*
+function jugar(){
+  comenzar_juego=true;
+}
+*/
 
 
 /**
@@ -395,7 +402,13 @@ $(function () {
   crearMenu();
   opcionesMenu(Menus.PRINCIPAL);
   // Finalmente, realizamos el primer renderizado.
-  render();
+  if(comenzar_juego){  
+      menuArray.forEach(function(contenidoMenu){
+        contenidoMenu.hide();
+      });
+
+    render();
+     }
   //console.log("VALORES SCREEN : "+ window.screen.width+" "+window.screen.height);
 });
 

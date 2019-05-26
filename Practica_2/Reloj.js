@@ -71,6 +71,10 @@ class Reloj extends THREE.Object3D{
 		console.log("Tiempo : " +horas+ " : " +minutos+ " : "+ segundos +" : "+ centesimas);
 	}
 
+	getSegundos(){
+		return segundos;
+	}
+
 	update(contar){
 		if(contar){
 			this.cronometro();
