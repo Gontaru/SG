@@ -1,55 +1,10 @@
 
 /// La escena que tendrá todo lo que se tiene en cuenta al hacer un render
 //  Lo que no esté incluido en la escena no será procesado por el renderer
-/*
-La librería stats.js te permite controlar el uso de memoria de tu proyecto 
-en three.js, muy importante para no consumir excesivamente la memoria 
-mientras se ejecuta la animación.
-*/
 scene = null;
-comenzar_juego=false;
+
 /// La variable que referenciará al renderer
 renderer = null;
-
-/// El objeto que referencia a la interfaz gráfica de usuario
-gui = null;
-
-//contenido del menu
-var cMenu = null;
-//array parta el menu
-var menuArray = [];
-//estado del juego
-var menuActual = null;
-//primera vez que se ejecuta la funcion jugar
-var firstTime = true;
-//estado pantalla
-var showStatus = true;
-//menu anterior
-var menuprevio = null;
-savedTime = null;
-requestID = null;
-/**
-*@enum - posibilidades del menu
-*/
-const Menus = {
-	PRINCIPAL: 0,
-	INSTRUCIONES: 1,
-	OPCIONES: 2,
-};
-/**
-*@enum - posibilidades al jugat
-*/
-const estadoJuego = {
-	INICIAR: 0,
-	MENU_PRINCIPAL: 1,
-	PAUSA: 2,
-	JUGANDO: 3,
-	FIN: 4,
-	
-};
-
-//VARIABLE PARA CONTROLAR EL ESTADO DEL JUEGO
-var estadoActualJuego = null;
 
 Speed = 100;
 
@@ -63,36 +18,6 @@ DespDerecho=0.0;
 DespIzquierdo=0.0;
 DespSuperior=0.0;
 DespInferior=0.0;
-
-
-//metodos necesarios para el procesamiento de estadisticas con stats
-//Crea GUI, agrega informacion estadisticas
-/**
-*@param widthStats -booleano ara mostrar las estadisticas
-*/
-function createGUI(widthStats){
-	var gui = new dat.GUI();
-	//listener
-	if(widthStats)
-		stats = initStats();
-}
-//añade estadisticas despues de crer el div
-/**
-*@return The statistics object
-*/
-
-function initStats(){
-	var stats = new Stats();
-	stats.setMode(0); //0:fps, 1:ms
-	
-	//Aling top-left
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.left = '0px';
-	stats.domElement.style.top = '0px';
-		$("#Stats-output").append(stats.domElement);
-		
-	return stats;
-}
 /// Se crea y configura un renderer WebGL
 /**
  * El renderer recorrerá el grafo de escena para procesarlo y crear la imagen resultante. 
@@ -272,152 +197,7 @@ function onDocumentKeyDown(event) {
         }
     //SI PULSAMOS EL ESPACIO NUESTRA NAVE DISPARA
     }
-
-/*
-    if (keys["espacio"] == true) {
-        scene.naveProta.disparar(scene);
-    }*/
-    //SI PULSAMOS LA T OBTENEMOS EL TIEMPO TRANSCURRIDO
-    else if(keyCode == 84){
-        scene.reloj.getTiempo();
-    }
-    //PRUEBA PARA VER COMO SE ELIMINA UNA FIGURA DE LA ESCENA 
-    //LO USAREMOS PARA DESTRUIR LAS NAVES
-    else if(keyCode == 88){
-        scene.remove(scene.naveProta);
-		createGUI(true);
-        render();
-    }
-
 }
-
-//funcion iniciar juego
-function jugar(){
-  console.log("JUGAAAAR");
-	requestAnimationFrame(render);
-	
-}
-
-
-/**
- * @param {Menu} menuId - id's del array del menu
- */
-//mostrar menú del juego
-function opcionesMenu(menuId = Menus.PRINCIPAL){
-	//ocultar menuActual
-	if(menuId === cMenu){
-		menuArray[menuId].hide();
-			$('#contenedorPantallaCompleta').show();
-			//actualizar
-		menuprevio = cMenu;
-		cMenu = null;
-	//mostrar el menu seleccionado y ocultar el anterior
-	//si el menuID está contenido dentrlo del enumerado Menus...
-	} else if ( menuId != 0 || menuId < menuArray.length){ 
-	//si el menuActual no es null, ocurlatrlo
-	if(menuActual != null)
-		menuArray[menuActual].hide();
-	//muestra el menú con id....
-		$('#contenedorPantallaCompleta').show();
-		menuArray[menuId].show();
-		//actualiza menu actual y anterior(para volver volver atras)
-		menuprevio = menuActual;
-		menuActual = menuId;
-	}
-	if(cMenu === Menus.PRINCIPAL)
-		estadoActualJuego = estadoJuego.INICIAR;
-	
-}
-
-//CREACIÓN DE EL MENÚ DEL JUEGO
-
-function crearMenu() {
-	//crear cuadrado (div) que será el menú donde estan las distintas opciones
-	var contenedorPantallaCompleta = $ ('#contenedorPantallaCompleta')
-	//añadimos color y transparencia
-	.addClass('w3-contenedor w3-blue')
-	//pantalla completa!
-	.css ({
-		'height': '100vh',
-		'width': '100vw',
-		/*
-		Un elemento fixed (fijo) se posiciona a la ventana 
-		del navegador de manera relativa, lo que significa que se 
-		mantendrá en el mismo lugar incluso después de hacer 
-		scroll en la página.
-		*/
-		'position': 'fixed',
-		'z-index': '10',
-		'top': '0',
-		'opacity': '0.85'
-	}).hide();
-	
-	//titulo y botones
-	var menu =[{
-		headingText: 'Space WAR',
-		buttonsArray: [
-		/*hay que añadir, y la funcion que realice el botn*/
-		{text: 'Jugar', func:'jugar()'},
-		{text:'Instrucciones', func: 'opcionesMenu(Menus.INSTRUCIONES)'},
-		{text:'Opciones'},
-		],
-	},
-	{
-		headingText: 'Instrucciones',
-		image: {
-			src: './imgs/instrucciones.png',
-			title: 'Instrucciones',
-			alt: 'Instrucciones',
-		},
-		buttonsArray: [{
-			text: 'Atrás', func: 'opcionesMenu(menuprevio)'
-		}]
-	}
-	/*añadir el heading text de cada accion*/
-	];
-	
-	//para cada menu, agregar al html
-	menu.forEach(function(contenidoMenu){
-		//cuadrado menú
-		var cMenu = $('<form>').addClass(
-			'menu w3-contenedor w3-text-light-grey w3-center w3-display-middle w3-quarter'
-			);
-		contenedorPantallaCompleta.append(cMenu);
-	//Añadir las etiquetas del menu
-	cMenu.append(
-		$('<label>').text(contenidoMenu.headingText)
-		.addClass(
-			'w3-xxlarge w3-margin-bottom w3-panel w3-block w3-round-large w3-teal'
-		)
-	);
-	//añadir los botones al menu
-	contenidoMenu.buttonsArray.forEach(function(boton){
-		cMenu.append(
-			$('<input>').attr({
-				'id': (boton.id == undefined? '': boton.id),
-				'value': boton.text,
-				'onmouseup': boton.func,
-				'type': 'button'
-			}).addClass('mybutton')
-		);
-	});
-	//para que se vea la imagen de instrucciones
-	if(contenidoMenu.image !== undefined)
-		cMenu.append(
-			$('<img>').attr({
-				'src': contenidoMenu.image.src,
-				'title': contenidoMenu.image.title,
-				'alt': contenidoMenu.image.alt,
-			}).width('100%').addClass('w3-margin-bottom w3-round-large')
-	);
-	
-	menuArray.push(cMenu.hide());
-	
-	});
-		
-	
-}
-
 
 /// La función principal
 $(function () {
@@ -444,23 +224,10 @@ $(function () {
   window.addEventListener("keyup", onDocumentKeyUp, false);
   window.addEventListener("keypress", onDocumentKeyPress, false);
 
-  // Se crea una interfaz gráfica de usuario vacia
-  gui = new dat.GUI();
-  
   // Se crea la escena. La escena es una instancia de nuestra propia clase encargada de crear y gestionar todos los elementos que intervienen en la escena.
   scene = new MyScene (renderer.domElement, limiteSuperior, limiteDerecho);
   
-  //agregamos el menú de inicio
-  crearMenu();
-  opcionesMenu(Menus.PRINCIPAL);
   // Finalmente, realizamos el primer renderizado.
-  if(comenzar_juego){  
-      menuArray.forEach(function(contenidoMenu){
-        contenidoMenu.hide();
-      });
-
-    render();
-     }
+  render();
   //console.log("VALORES SCREEN : "+ window.screen.width+" "+window.screen.height);
 });
-
